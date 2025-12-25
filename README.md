@@ -1,54 +1,153 @@
-# ResearchTeam Crew
+# CrewAI Research Pipeline
 
-Welcome to the ResearchTeam Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+This repository contains an automated research pipeline built with **CrewAI** for generating structured scientific manuscripts from data-driven analysis.
+
+The project demonstrates how multi-agent orchestration can be used to organize complex analytical workflows, coordinate research tasks, and produce reproducible research artifacts, including a complete manuscript and document exports.
+
+---
+
+## Prerequisites
+
+Before running the pipeline, ensure the following are installed:
+
+- **Python 3.10 or newer**
+- **Pandoc** (required for document conversion)
+  - Download from: https://pandoc.org/installing.html
+
+> ⚠️ Pandoc must be installed system-wide and available in your PATH.  
+> `pypandoc` is only a Python wrapper and does **not** include Pandoc itself.
+
+---
 
 ## Installation
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
-
-First, if you haven't already, install uv:
+1. Clone the repository:
 
 ```bash
-pip install uv
+git clone https://github.com/uliana0203/crewai-research-pipeline.git
+cd crewai-research-pipeline
 ```
 
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/research_team/config/agents.yaml` to define your agents
-- Modify `src/research_team/config/tasks.yaml` to define your tasks
-- Modify `src/research_team/crew.py` to add your own logic, tools and specific args
-- Modify `src/research_team/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+2. (Optional but recommended) Create and activate a virtual environment:
 
 ```bash
-$ crewai run
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux / macOS
+source .venv/bin/activate
 ```
 
-This command initializes the research_team Crew, assembling the agents and assigning them tasks as defined in your configuration.
+3. Install Python dependencies:
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```bash
+pip install -r requirements.txt
+```
 
-## Understanding Your Crew
+This will install CrewAI, `pypandoc`, and all required Python packages.
 
-The research_team Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+---
 
-## Support
+## Overview
 
-For support, questions, or feedback regarding the ResearchTeam Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+The pipeline coordinates multiple specialized agents to perform sequential research tasks:
 
-Let's create wonders together with the power and simplicity of crewAI.
+- Literature review and contextualization
+- Methodology specification
+- Data analysis and validation
+- Results and discussion drafting
+- Ethics and integrity checks
+- Internal peer-review simulation
+- Assembly of a complete manuscript
+- Conversion of Markdown outputs into DOCX using Pandoc
+
+All intermediate and final artifacts are preserved in the `outputs/` directory.
+
+---
+
+## Repository Structure
+
+```text
+.
+├── data/
+│   └── WHO-COVID-19-global-daily-data.csv
+│
+├── src/
+│   └── research_team/
+│       ├── config/
+│       │   ├── agents.yaml
+│       │   └── tasks.yaml
+│       ├── tools/
+│       │   └── export_doc.py
+│       ├── crew.py
+│       └── main.py
+│
+├── outputs/
+│   ├── 00_manuscript.md
+│   ├── 00_manuscript.docx
+│   ├── 01_outline.md
+│   ├── 02_literature_review.md
+│   ├── 03_methodology.md
+│   ├── 04_data_analysis.md
+│   ├── 05_results_discussion.md
+│   ├── 06_edited_manuscript.md
+│   ├── 07_references.md
+│   ├── 08_ethics_checklist.md
+│   ├── 09_peer_review.md
+│   ├── 10_submission_checklist.md
+│   └── 11_cover_letter.md
+│
+├── requirements.txt
+├── pyproject.toml
+├── uv.lock
+└── README.md
+```
+
+---
+
+## Running the Pipeline
+
+### Using CrewAI CLI (recommended)
+
+```bash
+crewai run
+```
+
+This executes the full research workflow and generates all intermediate and final artifacts.
+
+---
+
+### Direct execution
+
+```bash
+python src/research_team/main.py
+```
+
+---
+
+## Data
+
+The `data/` directory contains the dataset used by the pipeline:
+
+- `WHO-COVID-19-global-daily-data.csv` — publicly available daily global COVID-19 statistics provided by the World Health Organization (WHO).
+
+---
+
+## Outputs
+
+The `outputs/` directory is intentionally committed to the repository.  
+It contains all generated research artifacts, including intermediate stages and the final manuscript in both Markdown and DOCX formats.
+
+---
+
+## Notes and Limitations
+
+- The pipeline is research-oriented and exploratory by design
+- Generated content may require human review before real-world use
+- PDF export is not enabled by default and may require additional LaTeX tooling
+
+---
+
+## License
+
+This repository is provided for research, demonstration, and educational purposes.
