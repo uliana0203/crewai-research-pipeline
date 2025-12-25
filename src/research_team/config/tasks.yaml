@@ -1,0 +1,194 @@
+# src/research_team/config/tasks.yaml
+
+search_task:
+  agent: literature_analyst
+  description: >
+    Systematically search, screen, and synthesize prior work on {topic}.
+    Focus on: (1) key themes and methods, (2) datasets and experimental setups,
+    (3) major gaps and challenges, (4) emerging trends and future directions.
+    Present findings in a structured format with methodological patterns, main
+    results, and limitations. Include PRISMA-style notes (search strings,
+    inclusion/exclusion criteria, and screening summary) where applicable.
+  expected_output: >
+    A structured literature review document and a supporting table summarizing
+    prior research on {topic}.
+  output_file: outputs/02_literature_review.md
+
+outline_task:
+  agent: research_lead
+  description: >
+    Define the problem statement, objectives, and contributions, then produce a detailed
+    IMRaD outline aligned with {target_journal}. Ensure that scope, claims, and level of
+    technical detail match {target_journal} expectations and {style} formatting norms.
+    Include placeholders for tables/figures and specify where key results will be reported.
+  expected_output: >
+    A well-organized outline (abstract, introduction, methods, results, discussion,
+    conclusion, acknowledgments/funding, references), with section-level bullet points.
+  output_file: outputs/01_outline.md
+  context:
+    - search_task
+
+methodology_task:
+  agent: methodology_designer
+  description: >
+    Specify datasets located at {dataset_path}, including file inventory, schema (columns/fields),
+    temporal coverage, and provenance. Describe preprocessing, feature engineering,
+    models/procedures, baselines, metrics, ablations, and reproducibility details in compliance
+    with {target_journal} standards and {style} conventions. Clearly define:
+    (1) train/validation/test split logic (time-aware if applicable),
+    (2) hyperparameter strategy,
+    (3) compute/runtime environment assumptions,
+    (4) evaluation protocol for each forecast horizon (if relevant),
+    (5) statistical/robustness checks and limitations.
+  expected_output: >
+    A clear, detailed methodology section covering data handling, experimental design,
+    evaluation, and reproducibility (including ablation plan and baselines).
+  output_file: outputs/03_methodology.md
+  context:
+    - outline_task
+
+analysis_task:
+  agent: data_analyst
+  description: >
+    IMPORTANT:
+    First, enumerate and list ALL files actually present in {dataset_path}.
+    Explicitly state the exact number of datasets found.
+    If only one dataset is present, state "one dataset".
+    Do NOT assume or invent additional datasets.
+
+    Perform data analysis using datasets located at {dataset_path}.
+    Load all available data files from this directory, inspect structure,
+    validate assumptions (date ranges, missingness, duplicates, outliers),
+    and document preprocessing decisions.
+  expected_output: >
+    A detailed data analysis report describing datasets, preprocessing steps, data quality
+    issues, and readiness for modeling, including a concise "Data Inventory" section.
+  output_file: outputs/04_data_analysis.md
+  context:
+    - methodology_task
+
+results_task:
+  agent: results_writer
+  description: >
+    Draft Results and Discussion grounded in evidence from analyses based on datasets at
+    {dataset_path}. Summarize experimental outcomes, compare against baselines, and report
+    ablation findings per the methodology. Include: key quantitative results (tables),
+    narrative interpretation, limitations, threats to validity, and future work. Ensure that
+    claims are supported by results and that negative/neutral findings are reported transparently.
+  expected_output: >
+    A cohesive Results & Discussion draft integrating findings, baseline comparisons, and
+    ablation insights, with clear references to reported tables/figures.
+  output_file: outputs/05_results_discussion.md
+  context:
+    - analysis_task
+
+editing_task:
+  agent: language_editor
+  description: >
+    Polish the manuscript components for clarity, cohesion, and adherence to {style} and
+    {target_journal} guidelines. Enforce consistent terminology, headings, tense/voice,
+    and remove redundancy. Ensure the manuscript reads as a single narrative and that
+    each section matches the outline structure.
+  expected_output: >
+    A language-edited manuscript draft with improved readability, consistent style, and
+    journal-appropriate tone.
+  output_file: outputs/06_edited_manuscript.md
+  context:
+    - results_task
+
+citation_task:
+  agent: citation_manager
+  description: >
+    Normalize in-text citations and the references list, ensuring accuracy and adherence
+    to {style}. Add DOIs/identifiers where available, de-duplicate entries, and validate
+    that each in-text citation has a corresponding reference and vice versa. Flag any
+    missing bibliographic fields or suspect references.
+  expected_output: >
+    A cleaned, validated references section and correctly formatted in-text citations,
+    with DOIs added where available and a short "Citation QA" notes section.
+  output_file: outputs/07_references.md
+  context:
+    - editing_task
+
+assemble_manuscript_task:
+  agent: manuscript_assembler
+  description: >
+    Assemble a single, journal-ready manuscript by merging all prior sections.
+    Use the outline as the scaffold and integrate: methodology, data analysis summary,
+    results & discussion, language edits, and the finalized references. Ensure IMRaD flow,
+    consistent headings and numbering, in-text citations per {style}, and adherence to
+    {target_journal} conventions. Include:
+    - Abstract (150–250 words),
+    - 3–6 keywords ({keywords}),
+    - Acknowledgments/funding note (brief, journal-appropriate),
+    - Ethics/transparency placeholders if required by {target_journal}.
+    Ensure internal consistency (same dataset names, same metrics, same horizons) across sections.
+  expected_output: >
+    A unified, submission-ready manuscript in Markdown that consolidates all sections and references.
+  output_file: outputs/00_manuscript.md
+  context:
+    - outline_task
+    - methodology_task
+    - analysis_task
+    - results_task
+    - editing_task
+    - citation_task
+
+ethics_task:
+  agent: ethics_officer
+  description: >
+    Verify transparency statements, COI, data permissions/licensing, reproducibility checklist,
+    and academic integrity compliance for the assembled manuscript. Confirm that the manuscript
+    includes (or explicitly justifies omission of) required statements per {target_journal}
+    (e.g., data availability, code availability, funding, acknowledgments, competing interests).
+    Use the provided ethics note as baseline: {ethics_note}.
+  expected_output: >
+    An ethics & integrity checklist covering all requirements, plus a short list of required
+    edits to bring the manuscript into full compliance (if any).
+  output_file: outputs/08_ethics_checklist.md
+  context:
+    - assemble_manuscript_task
+
+review_task:
+  agent: peer_reviewer
+  description: >
+    Provide a structured internal peer review of the assembled manuscript (novelty, technical
+    soundness, clarity, relevance to {target_journal}). Deliver actionable revisions prioritized
+    by impact: critical issues first (method validity, results support), then clarity and style.
+    Highlight any missing experiments, weak baselines, or overclaims.
+  expected_output: >
+    A structured review report with prioritized feedback, suggested rewrites, and a short
+    "acceptability risk" assessment for {target_journal}.
+  output_file: outputs/09_peer_review.md
+  context:
+    - ethics_task
+
+submission_checklist_task:
+  agent: project_manager
+  description: >
+    Create the final submission checklist per {target_journal}. Verify presence and compliance of:
+    manuscript structure, abstract length, keywords, figures/tables placeholders, citation style,
+    ethics/transparency statements, and file naming. Include a final "ready to submit" verdict with
+    any remaining blockers clearly enumerated.
+  expected_output: >
+    A finalized submission checklist confirming all required items are present, with any blockers
+    and remediation steps listed.
+  output_file: outputs/10_submission_checklist.md
+  context:
+    - review_task
+
+cover_letter_task:
+  agent: project_manager
+  description: >
+    Draft the journal-ready cover letter for {target_journal} summarizing the manuscript’s
+    contribution, novelty, and fit. Include key compliance statements (originality, no
+    simultaneous submission, ethical compliance), and a concise statement of significance
+    for the journal’s readership.
+  expected_output: >
+    A polished cover letter ready to submit to {target_journal}.
+  output_file: outputs/11_cover_letter.md
+  context:
+    - submission_checklist_task
+
+
+

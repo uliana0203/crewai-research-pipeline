@@ -1,0 +1,24 @@
+.env
+__pycache__/
+
+# Virtual env
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local data (keep placeholders only)
+data/*
+!data/.gitkeep
+
+*.msi
+
